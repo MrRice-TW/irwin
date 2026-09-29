@@ -1,0 +1,10 @@
+{
+  "version": "100.18.0",
+  "source": "https://downloads.mongodb.org/tools/db/release.json",
+  "targets": {
+    "win-x64": { "url": "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-windows-x86_64-100.18.0.zip", "sha256": "feb29eed9788b1da2fb6f7ae63909ac790a6fe3a363947e68590f048bed08edb" },
+    "mac-arm64": { "url": "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-macos-arm64-100.18.0.zip", "sha256": "d8f020ed71681f01514e0d2316c446289d0fda391cd3cab0984e47170aabf97e" },
+    "mac-x64": { "url": "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-macos-x86_64-100.18.0.zip", "sha256": "db50ae92da0f8c88e30c2b98d4498c4ac3a20107fdc0e488b9b5b6417b013e67" },
+    "linux-x64": { "url": "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.18.0.tgz", "sha256": "09b14223910dea32fc36fe5eb28cd78e7a2415b0cef1feb981383dc6231ee194" }
+  }
+}

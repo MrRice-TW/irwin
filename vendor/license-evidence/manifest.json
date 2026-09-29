@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "packages": {
+    "@aws-sdk/credential-provider-http@3.972.72": {
+      "notice": {
+        "source": "vendor",
+        "path": "aws-sdk-js-v3-LICENSE",
+        "sha256": "edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+        "sourceUrl": "https://raw.githubusercontent.com/aws/aws-sdk-js-v3/v3.972.0/LICENSE"
+      }
+    },
+    "@aws-sdk/credential-provider-login@3.972.77": {
+      "notice": {
+        "source": "vendor",
+        "path": "aws-sdk-js-v3-LICENSE",
+        "sha256": "edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+        "sourceUrl": "https://raw.githubusercontent.com/aws/aws-sdk-js-v3/v3.972.0/LICENSE"
+      }
+    },
+    "@aws-sdk/nested-clients@3.997.44": {
+      "notice": {
+        "source": "vendor",
+        "path": "aws-sdk-js-v3-LICENSE",
+        "sha256": "edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+        "sourceUrl": "https://raw.githubusercontent.com/aws/aws-sdk-js-v3/v3.997.0/LICENSE"
+      }
+    },
+    "cli-table@0.3.11": {
+      "declaredLicense": "MIT",
+      "licenseProof": {
+        "source": "package",
+        "path": "LICENSE",
+        "sha256": "ca3d2af003b3a718fc9d43e5d232955d5e089c8b5d8b01fcbe9fa26f1e76f0b0",
+        "sourceUrl": "https://registry.npmjs.org/cli-table/0.3.11"
+      }
+    },
+    "data-uri-to-buffer@4.0.1": {
+      "notice": {
+        "source": "package",
+        "path": "README.md",
+        "sha256": "a7cc4332acfa1f9b6530e01aac77fefe74f2efa32579215fddaa473013f9a25c",
+        "sourceUrl": "https://registry.npmjs.org/data-uri-to-buffer/4.0.1"
+      }
+    },
+    "degenerator@5.0.1": {
+      "notice": {
+        "source": "package",
+        "path": "README.md",
+        "sha256": "72da4948a54a285c3f6d2bc398147dc21ca082316919653dc7c1198dc55a271c",
+        "sourceUrl": "https://registry.npmjs.org/degenerator/5.0.1"
+      }
+    },
+    "isarray@1.0.0": {
+      "notice": {
+        "source": "package",
+        "path": "README.md",
+        "sha256": "ff138e683771b187f3629c383db72ee7d632009010a36d08e18e8d2a34222ec7",
+        "sourceUrl": "https://registry.npmjs.org/isarray/1.0.0"
+      }
+    },
+    "reservoir@0.1.2": {
+      "notice": {
+        "source": "package",
+        "path": "README.md",
+        "sha256": "b4044a87d387484c5f436bcb297755a1c904ae4a94341b9f3ca7cf45068363c0",
+        "sourceUrl": "https://registry.npmjs.org/reservoir/0.1.2"
+      }
+    },
+    "saxes@5.0.1": {
+      "notice": {
+        "source": "vendor",
+        "path": "saxes-v5.0.1-LICENSE",
+        "sha256": "0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e",
+        "sourceUrl": "https://raw.githubusercontent.com/lddubeau/saxes/v5.0.1/LICENSE"
+      }
+    }
+  }
+}

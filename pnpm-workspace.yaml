@@ -1,0 +1,17 @@
+allowBuilds:
+  electron: true
+  esbuild: true
+  ssh2: true
+  electron-winstaller: false
+  cpu-features: false
+  win-export-certificate-and-key: false
+  kerberos: false
+  mongodb-client-encryption: false
+  mongodb-memory-server: false
+overrides:
+  dompurify: 3.4.16
+  uuid: 11.1.1
+  # ExcelJS's old ZIP reader pulls in packages without complete license notices.
+  "exceljs>unzipper": 0.12.5
+  # The optional addon was never built; mongosh uses the driver's DNS fallback.
+  "@mongodb-js/devtools-connect>os-dns-native": "-"

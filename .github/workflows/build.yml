@@ -1,0 +1,59 @@
+name: Desktop packages
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-24.04, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node node_modules/electron/install.js
+      - name: Stage native Database Tools
+        run: pnpm tools:fetch
+        if: runner.os != 'macOS'
+      - name: Stage both macOS architectures
+        run: |
+          pnpm tools:fetch mac-x64
+          pnpm tools:fetch mac-arm64
+        if: runner.os == 'macOS'
+      - run: pnpm release:preflight
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm package --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - run: pnpm release:verify
+        if: runner.os != 'macOS'
+      - name: Verify both macOS bundles
+        run: |
+          node scripts/verify-package.mjs --unpacked release/mac/Irwin.app
+          node scripts/verify-package.mjs --unpacked release/mac-arm64/Irwin.app
+        if: runner.os == 'macOS'
+      - run: pnpm release:manifest
+      - run: node tests/e2e/desktop.mjs
+        if: runner.os == 'Windows'
+        env:
+          WORKBENCH_EXECUTABLE: ${{ github.workspace }}\release\win-unpacked\Irwin.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: irwin-unsigned-candidate-${{ matrix.os }}
+          if-no-files-found: error
+          path: |
+            release/Irwin-*.exe
+            release/Irwin-*.deb
+            release/Irwin-*.dmg
+            release/release-manifest.json
+            .runtime/desktop-smoke.json

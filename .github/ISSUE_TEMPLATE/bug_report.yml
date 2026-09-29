@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible problem in Irwin.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include credentials, connection strings, private keys, production data, or database exports. Use disposable test data and redact logs.
+  - type: input
+    id: version
+    attributes:
+      label: Irwin version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and architecture
+      placeholder: Ubuntu 24.04 x64, Windows 11 x64, or macOS 14 arm64
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use a disposable local database. Remove private hostnames and user data.
+      placeholder: |
+        1. Open ...
+        2. Choose ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Check carefully for connection strings, database names, usernames, and customer data before attaching files.
+    validations:
+      required: false

@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+dist/
+release/
+out/
+/release-qa-*/
+/tmp-test.txt
+vendor/tools/
+.runtime/
+/docs/superpowers/
+coverage/
+/build/third-party-licenses/
+*.log
+.env*
+!.env.example
+.DS_Store
+Thumbs.db

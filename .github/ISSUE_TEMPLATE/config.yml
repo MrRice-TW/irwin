@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Private security vulnerability report
+    url: https://github.com/piayru/irwin/security/policy
+    about: Use the private contact in the security policy. Do not disclose vulnerabilities or credentials in a public issue.
