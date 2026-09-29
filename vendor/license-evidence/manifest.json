@@ -58,6 +58,14 @@
         "sourceUrl": "https://registry.npmjs.org/isarray/1.0.0"
       }
     },
+    "macos-export-certificate-and-key@2.0.1": {
+      "notice": {
+        "source": "vendor",
+        "path": "apache-2.0-LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "sourceUrl": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+      }
+    },
     "reservoir@0.1.2": {
       "notice": {
         "source": "package",

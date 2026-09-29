@@ -54,9 +54,15 @@ Use Node.js 24 and pnpm 11.1.0 on the native target operating system. Clone the 
 ```sh
 git clone https://github.com/piayru/irwin.git
 cd irwin
+node --version
+corepack enable
+corepack prepare pnpm@11.1.0 --activate
+pnpm --version
 pnpm install --frozen-lockfile
 node node_modules/electron/install.js
 ```
+
+The version checks must report Node.js `v24.x.x` and pnpm `11.1.0`. If you use nvm, the repository's `.nvmrc` lets you prepare the required runtime with `nvm install` followed by `nvm use`. Do not continue a release build with a different Node.js or pnpm major version just because dependency installation only produced a warning.
 
 On Windows or Ubuntu, fetch the matching Database Tools and build the native package:
 
@@ -77,6 +83,15 @@ pnpm package --publish never
 node scripts/verify-package.mjs --unpacked release/mac/Irwin.app
 node scripts/verify-package.mjs --unpacked release/mac-arm64/Irwin.app
 ```
+
+Successful packaging writes `release/Irwin-<version>-mac-arm64.dmg` and `release/Irwin-<version>-mac-x64.dmg`. The verification commands must both report `PASSED`; a generated DMG is not release-ready when verification reports diagnostics.
+
+### macOS source-build troubleshooting
+
+- `ERR_PNPM_IGNORED_BUILDS` naming `macos-export-certificate-and-key` means pnpm did not receive a valid build-policy decision. Irwin's unsigned Preview build does not use this optional certificate-export helper, so `pnpm-workspace.yaml` intentionally sets it to `false`. Do not commit pnpm's temporary `set this to true or false` placeholder, and do not approve the native build merely to make installation continue.
+- `TOOLS_MISSING` from `pnpm release:preflight` means one or both Database Tools bundles have not been staged. On macOS, fetch both `mac-x64` and `mac-arm64` even when the build host has only one of those architectures.
+- electron-builder's message that macOS application code signing was skipped is expected for an unsigned Preview. It is not a successful signing or notarization result, and the resulting app still requires the documented Gatekeeper exception when downloaded.
+- A `LICENSES_PENDING_REVIEW` package-verification result is a release blocker, not a build warning to ignore. Add pinned license evidence under `vendor/license-evidence`, regenerate the inventory, rebuild the package, and rerun both unpacked-app verification commands.
 
 Local package output is unsigned unless the maintainer configures platform signing. A package build does not count as native installation validation. See the [compatibility matrix](COMPATIBILITY.md) and [release checklist](RELEASE_CHECKLIST.md) before distributing an installer.
 

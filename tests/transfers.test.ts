@@ -17,6 +17,7 @@ const completed = new Map<string, any>();
 const transfers = new TransferService(database, (p) => {
   if (p.status !== "running") completed.set(p.jobId, p);
 });
+const toolsTarget = `${process.platform === "win32" ? "win" : process.platform === "darwin" ? "mac" : "linux"}-${process.arch}`;
 beforeAll(async () => {
   directory = await mkdtemp(join(resolve(".runtime"), "transfer-test-"));
   server = await MongoMemoryServer.create({
@@ -61,7 +62,7 @@ async function job(overrides: any) {
   const { jobId } = transfers.start({
     ...input,
     resolved,
-    toolsPath: resolve("vendor/tools/win-x64"),
+    toolsPath: resolve("vendor/tools", toolsTarget),
   });
   await transfers.jobs.get(jobId)!.done;
   return completed.get(jobId);
