@@ -3,6 +3,7 @@ allowBuilds:
   esbuild: true
   ssh2: true
   electron-winstaller: false
+  macos-export-certificate-and-key: false
   cpu-features: false
   win-export-certificate-and-key: false
   kerberos: false

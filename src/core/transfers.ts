@@ -10,7 +10,14 @@ import {
   rm,
   realpath,
 } from "node:fs/promises";
-import { resolve, join, dirname, relative, isAbsolute } from "node:path";
+import {
+  resolve,
+  join,
+  dirname,
+  relative,
+  isAbsolute,
+  win32,
+} from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
 import { once } from "node:events";
@@ -87,7 +94,13 @@ const csvMappingSidecarSchema = z.union([
 export function within(directory: string, file: string) {
   const path = resolve(directory, file);
   const rel = relative(resolve(directory), path);
-  if (isAbsolute(file) || rel.startsWith("..") || isAbsolute(rel))
+  if (
+    isAbsolute(file) ||
+    win32.isAbsolute(file) ||
+    win32.parse(file).root !== "" ||
+    rel.startsWith("..") ||
+    isAbsolute(rel)
+  )
     throw new Error("Manifest path escapes selected directory");
   return path;
 }
