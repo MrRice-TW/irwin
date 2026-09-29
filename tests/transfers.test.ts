@@ -13,6 +13,13 @@ let client: MongoClient;
 let directory: string;
 let resolved: any;
 const database = new DatabaseService();
+const toolPlatform =
+  process.platform === "win32"
+    ? "win"
+    : process.platform === "darwin"
+      ? "mac"
+      : "linux";
+const toolsTarget = `${toolPlatform}-${process.arch}`;
 const completed = new Map<string, any>();
 const transfers = new TransferService(database, (p) => {
   if (p.status !== "running") completed.set(p.jobId, p);
@@ -61,7 +68,7 @@ async function job(overrides: any) {
   const { jobId } = transfers.start({
     ...input,
     resolved,
-    toolsPath: resolve("vendor/tools/win-x64"),
+    toolsPath: resolve("vendor/tools", toolsTarget),
   });
   await transfers.jobs.get(jobId)!.done;
   return completed.get(jobId);

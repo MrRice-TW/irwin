@@ -33,6 +33,7 @@ jobs:
       - run: pnpm audit --prod
       - run: pnpm release:licenses
       - run: node node_modules/electron/install.js
+      - run: pnpm tools:fetch
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
