@@ -3,12 +3,12 @@ allowBuilds:
   esbuild: true
   ssh2: true
   electron-winstaller: false
+  macos-export-certificate-and-key: false
   cpu-features: false
   win-export-certificate-and-key: false
   kerberos: false
   mongodb-client-encryption: false
   mongodb-memory-server: false
-  macos-export-certificate-and-key: false
 overrides:
   dompurify: 3.4.16
   uuid: 11.1.1

@@ -13,11 +13,17 @@ let client: MongoClient;
 let directory: string;
 let resolved: any;
 const database = new DatabaseService();
+const toolPlatform =
+  process.platform === "win32"
+    ? "win"
+    : process.platform === "darwin"
+      ? "mac"
+      : "linux";
+const toolsTarget = `${toolPlatform}-${process.arch}`;
 const completed = new Map<string, any>();
 const transfers = new TransferService(database, (p) => {
   if (p.status !== "running") completed.set(p.jobId, p);
 });
-const toolsTarget = `${process.platform === "win32" ? "win" : process.platform === "darwin" ? "mac" : "linux"}-${process.arch}`;
 beforeAll(async () => {
   directory = await mkdtemp(join(resolve(".runtime"), "transfer-test-"));
   server = await MongoMemoryServer.create({

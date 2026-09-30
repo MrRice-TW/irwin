@@ -128,11 +128,11 @@ try {
   await resize(1480, 960);
 
   await check(
-    "five preference sections and workspace/per-tab scope are visible",
+    "six preference sections and workspace/per-tab scope are visible",
     async () => {
       await openPreferences();
       await expect(dialog().locator("[data-preference-section]")).toHaveCount(
-        5,
+        6,
       );
       await section("query-results");
       await expect(dialog()).toContainText("BATCH");
@@ -169,6 +169,32 @@ try {
       assert.equal(visual.logoBackground, "rgba(0, 0, 0, 0)");
       await section("appearance");
       await shot("01-dark-zh-preferences-full");
+    },
+  );
+
+  await check(
+    "automatic update checks default on and can be disabled in Preferences",
+    async () => {
+      await section("updates");
+      const toggle = dialog().locator(
+        ".preferences-content input[type='checkbox']",
+      );
+      await expect(toggle).toBeChecked();
+      await toggle.uncheck();
+      await savePreferences();
+      assert.equal((await settingsSnapshot()).autoCheckUpdates, false);
+
+      await openPreferences();
+      await section("updates");
+      await expect(
+        dialog().locator(".preferences-content input[type='checkbox']"),
+      ).not.toBeChecked();
+      await dialog()
+        .locator(".preferences-content input[type='checkbox']")
+        .check();
+      await savePreferences();
+      assert.equal((await settingsSnapshot()).autoCheckUpdates, true);
+      await openPreferences();
     },
   );
 

@@ -884,20 +884,20 @@ try {
     .collection("people")
     .findOne({ name: "Ada Updated" });
   if (!editedPerson?._id) throw new Error("Could not find edited person");
-  const wholeDocument = JSON.stringify(
-    {
-      _id: { $oid: editedPerson._id.toHexString() },
-      name: "Ada Whole",
-      team: "Research",
-      score: 98,
-      active: true,
-      large: { $numberLong: "9007199254740993" },
-      description:
-        "This is a deliberately long table value used to verify selected-cell preview styling without covering adjacent columns.",
-    },
-    null,
-    2,
-  );
+  const wholeDocument = `{
+  _id: ObjectId("${editedPerson._id.toHexString()}"),
+  name: "Ada Whole",
+  team: "Research",
+  score: 98,
+  active: true,
+  count: Int32("7"),
+  ratio: Double("1.0"),
+  safeLong: Long("42"),
+  large: Long("9007199254740993"),
+  amount: Decimal128("1234.50"),
+  createdAt: ISODate("2025-01-02T03:04:05.000Z"),
+  description: "This is a deliberately long table value used to verify selected-cell preview styling without covering adjacent columns."
+}`;
   const editedRow = page
     .locator(".grid-row")
     .filter({ hasText: "Ada Updated" })
@@ -909,6 +909,12 @@ try {
     page.getByRole("button", { name: "格式化文件", exact: true }),
   ).toBeVisible();
   const documentEditor = page.locator("dialog .monaco-editor").first();
+  await expect(documentEditor.locator(".view-lines")).toContainText(
+    'ObjectId("',
+  );
+  await expect(documentEditor.locator(".view-lines")).not.toContainText(
+    "$oid",
+  );
   await documentEditor.click();
   await page.keyboard.press("Control+a");
   await page.keyboard.press("Backspace");
@@ -916,6 +922,18 @@ try {
   await page.keyboard.press("Control+End");
   await page.keyboard.press("Backspace");
   await page.getByRole("button", { name: "格式化文件", exact: true }).click();
+  await expect(documentEditor.locator(".view-lines")).toContainText(
+    'Double("1.0")',
+  );
+  await page.getByRole("button", { name: "檢視變更", exact: true }).click();
+  const documentChangesDialog = page
+    .locator("dialog")
+    .filter({ hasText: "文件變更" });
+  await expect(documentChangesDialog).toBeVisible();
+  await expect(documentChangesDialog.locator(".notice.error")).toHaveCount(0);
+  await documentChangesDialog
+    .getByRole("button", { name: "保留目前編輯", exact: true })
+    .click();
   await page.getByRole("button", { name: "儲存", exact: true }).click();
   await expect(
     page.locator(".grid-cell").filter({ hasText: /^Ada Whole$/ }),
@@ -926,6 +944,16 @@ try {
       .collection("people")
       .countDocuments({ name: "Ada Whole" }),
   ).toBe(1);
+  const savedWholeDocument = await client
+    .db("workbench_demo")
+    .collection("people")
+    .findOne({ name: "Ada Whole" }, { promoteValues: false });
+  expect(savedWholeDocument?.count?._bsontype).toBe("Int32");
+  expect(savedWholeDocument?.ratio?._bsontype).toBe("Double");
+  expect(savedWholeDocument?.safeLong?._bsontype).toBe("Long");
+  expect(savedWholeDocument?.large?._bsontype).toBe("Long");
+  expect(savedWholeDocument?.amount?._bsontype).toBe("Decimal128");
+  expect(savedWholeDocument?.createdAt).toBeInstanceOf(Date);
   checks.push("whole document edit and format");
   const copyId = new ObjectId();
   const copiedDocument = JSON.stringify(

@@ -153,6 +153,24 @@ test("count returns documents matching the current filter", async () => {
   });
   await expect(database.execute("queries.count", input)).resolves.toBe(2);
 });
+test("find filters accept literal ISODate and new Date range boundaries", async () => {
+  const coll = client.db("workbench_test").collection("date_range_docs");
+  await coll.deleteMany({});
+  await coll.insertMany([
+    { label: "before", createdAt: new Date("2024-12-31T23:59:59.999Z") },
+    { label: "inside", createdAt: new Date("2025-01-15T12:00:00.000Z") },
+    { label: "after", createdAt: new Date("2025-02-01T00:00:00.000Z") },
+  ]);
+  const input = querySchema.parse({
+    connectionId: "test",
+    database: "workbench_test",
+    collection: "date_range_docs",
+    filter:
+      '{createdAt: {$gte: ISODate("2025-01-01T00:00:00.000Z"), $lt: new Date("2025-02-01T00:00:00.000Z")}}',
+  });
+  const result = await database.run(input);
+  expect(result.rows.map((row) => decode(row.ejson).label)).toEqual(["inside"]);
+});
 test("native shell queries, cursor continuation and writes execute once", async () => {
   const coll = client.db("workbench_test").collection("shell_docs");
   await coll.insertMany(Array.from({ length: 105 }, (_, x) => ({ x })));

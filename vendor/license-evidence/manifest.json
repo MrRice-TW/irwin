@@ -58,12 +58,20 @@
         "sourceUrl": "https://registry.npmjs.org/isarray/1.0.0"
       }
     },
+    "lazy-val@1.0.5": {
+      "notice": {
+        "source": "vendor",
+        "path": "lazy-val-MIT-LICENSE.txt",
+        "sha256": "efe8f1903440d3e757fa3c91fdbbe410c496b7983f1a92420f252ce3b417e0ee",
+        "sourceUrl": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt"
+      }
+    },
     "macos-export-certificate-and-key@2.0.1": {
       "notice": {
         "source": "vendor",
-        "path": "apache-2.0-LICENSE",
-        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-        "sourceUrl": "https://www.apache.org/licenses/LICENSE-2.0.txt"
+        "path": "apache-2.0-LICENSE.txt",
+        "sha256": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+        "sourceUrl": "https://github.com/spdx/license-list-data/blob/31ba1a50e5397e00a304dbadc76531740e89ee48/text/Apache-2.0.txt"
       }
     },
     "reservoir@0.1.2": {

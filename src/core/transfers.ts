@@ -10,7 +10,14 @@ import {
   rm,
   realpath,
 } from "node:fs/promises";
-import { resolve, join, dirname, relative, isAbsolute, win32 } from "node:path";
+import {
+  resolve,
+  join,
+  dirname,
+  relative,
+  isAbsolute,
+  win32,
+} from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
 import { once } from "node:events";
@@ -90,6 +97,7 @@ export function within(directory: string, file: string) {
   if (
     isAbsolute(file) ||
     win32.isAbsolute(file) ||
+    win32.parse(file).root !== "" ||
     rel.startsWith("..") ||
     isAbsolute(rel)
   )

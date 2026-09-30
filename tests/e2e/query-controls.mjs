@@ -156,6 +156,24 @@ try {
     },
   );
   await check(
+    "Enter accepts the highlighted MongoDB operator suggestion",
+    async () => {
+      const filter = active().getByLabel("FILTER", { exact: true });
+      await filter.fill("{score:{$g");
+      const options = active().locator(".query-suggestions [role=option]");
+      await expect(options).toHaveCount(2);
+      await expect(options.nth(0)).toContainText("$gt");
+      await expect(options.nth(1)).toContainText("$gte");
+      await filter.press("ArrowDown");
+      await expect(options.nth(1)).toHaveAttribute("aria-selected", "true");
+      await filter.press("Enter");
+      await expect(filter).toHaveValue("{score:{$gte");
+      await expect(active().locator(".query-suggestions")).toHaveCount(0);
+      await expect(active().locator(".grid-row")).toHaveCount(3);
+      await filter.fill("{}");
+    },
+  );
+  await check(
     "Query fields resize and format valid Mongo literals without executing them",
     async () => {
       const filter = active().getByLabel("FILTER", { exact: true });

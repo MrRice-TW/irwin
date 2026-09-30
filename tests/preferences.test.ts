@@ -19,6 +19,7 @@ describe("preferences", () => {
     expect(settings.systemLightTheme).toBe("light");
     expect(settings.editorFontFamily).toContain("monospace");
     expect(settings.autoRunOnOpen).toBe(true);
+    expect(settings.autoCheckUpdates).toBe(true);
     expect(settings.rowDensity).toBe("comfortable");
     expect(settings.longTextDisplay).toBe("truncate");
     expect(settings.jsonExpandedDepth).toBe(0);
@@ -50,6 +51,7 @@ describe("preferences", () => {
       bsonTypeLabels: "always",
       jobNotifications: "all",
       jsonExpandedDepth: 2,
+      autoCheckUpdates: false,
       colors: { ...defaults.colors, string: "#123456" },
     });
 
@@ -76,6 +78,10 @@ describe("preferences", () => {
     expect(queryResults.jobNotifications).toBe(defaults.jobNotifications);
     expect(queryResults.theme).toBe("forest");
 
+    const updates = resetSettingsSection(current, "updates", defaults);
+    expect(updates.autoCheckUpdates).toBe(true);
+    expect(updates.theme).toBe("forest");
+
     const dataLanguage = resetSettingsSection(
       current,
       "data-language",
@@ -90,9 +96,10 @@ describe("preferences", () => {
       "editor",
       "query-results",
       "data-language",
+      "updates",
       "ai",
     ];
-    expect(sections).toHaveLength(5);
+    expect(sections).toHaveLength(6);
     const ai = resetSettingsSection(current, "ai", defaults);
     expect(ai.aiCloudConsent).toBe(false);
     expect(ai.aiDefaultProviderId).toBe("");

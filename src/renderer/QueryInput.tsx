@@ -6,6 +6,7 @@ import {
   editQueryIndentation,
   formatQuery,
   queryKeyIntent,
+  querySuggestionKeyIntent,
 } from "./query-editing";
 import { Modal, useUi, message } from "./ui";
 import {
@@ -83,7 +84,7 @@ export function QueryInput({
     .filter(
       (item) =>
         !item.detail.includes("→") &&
-        !["ISODate", "Last 7 days"].includes(item.label) &&
+        item.label !== "Last 7 days" &&
         item.label.toLowerCase().startsWith(word.toLowerCase()),
     )
     .slice(0, 12);
@@ -173,6 +174,28 @@ export function QueryInput({
           onClick={(e) => setPosition(e.currentTarget.selectionStart || 0)}
           onBlur={() => setOpen(false)}
           onKeyDown={(e) => {
+            const suggestionIntent = querySuggestionKeyIntent(
+              e.key,
+              open && !!options.length,
+              options.length,
+              selected,
+            );
+            if (suggestionIntent?.type === "accept") {
+              e.preventDefault();
+              e.stopPropagation();
+              accept(suggestionIntent.index);
+              return;
+            }
+            if (suggestionIntent?.type === "move") {
+              e.preventDefault();
+              setSelected(suggestionIntent.index);
+              return;
+            }
+            if (suggestionIntent?.type === "dismiss") {
+              e.stopPropagation();
+              setOpen(false);
+              return;
+            }
             const intent = queryKeyIntent(
               e.key,
               e.ctrlKey,
@@ -214,19 +237,6 @@ export function QueryInput({
               e.preventDefault();
               setOpen(true);
               return;
-            }
-            if (!open || !options.length) return;
-            if (e.key === "Escape") {
-              e.stopPropagation();
-              setOpen(false);
-            }
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-              e.preventDefault();
-              setSelected(
-                (i) =>
-                  (i + (e.key === "ArrowDown" ? 1 : options.length - 1)) %
-                  options.length,
-              );
             }
           }}
         />

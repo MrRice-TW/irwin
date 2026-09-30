@@ -3,7 +3,12 @@ import type { Settings } from "../shared/contracts";
 export const AI_SETTINGS_CHANGED = "irwin:ai-settings-changed";
 
 export type PreferenceSection =
-  "appearance" | "editor" | "query-results" | "data-language" | "ai";
+  | "appearance"
+  | "editor"
+  | "query-results"
+  | "data-language"
+  | "updates"
+  | "ai";
 
 export type ResolvedTheme = Exclude<Settings["theme"], "system">;
 
@@ -56,6 +61,11 @@ export function resetSettingsSection(
         timezone: defaults.timezone,
         datetimeFormat: defaults.datetimeFormat,
         colors: { ...defaults.colors },
+      };
+    case "updates":
+      return {
+        ...current,
+        autoCheckUpdates: defaults.autoCheckUpdates,
       };
     case "ai":
       return {

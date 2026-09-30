@@ -7,7 +7,10 @@ import {
   nativeTheme,
   clipboard,
   Notification,
+  shell,
+  net,
 } from "electron";
+import electronUpdater from "electron-updater";
 import { join, resolve } from "node:path";
 import { mkdirSync, existsSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
@@ -27,6 +30,10 @@ import { developmentIconPath } from "./app-icon";
 import { nativeThemeSource } from "./theme";
 import { capInteractiveQueryTimeout } from "../shared/query-timeout";
 import { jobNotificationKind } from "../shared/job-notifications";
+import {
+  shouldAutoCheckForUpdates,
+  UpdateService,
+} from "./update-service";
 import {
   assertCsvSidecarTargetSafe,
   writeCsvFormulaSidecar,
@@ -54,6 +61,7 @@ import {
 let window: BrowserWindow;
 let storage: Storage;
 let database: WorkerClient;
+let updateService: UpdateService;
 let allowWindowClose = false;
 let shuttingDown = false;
 const routes = new Map<string, Route>();
@@ -579,6 +587,7 @@ async function request(command: Command, raw: any): Promise<any> {
     case "app.status":
       return {
         version: app.getVersion(),
+        update: updateService?.status,
         platform: process.platform,
         secureStorage: storage.secure(),
         connections: [...routes.keys()],
@@ -589,6 +598,13 @@ async function request(command: Command, raw: any): Promise<any> {
           ),
         ),
       };
+    case "updates.check":
+      return updateService.check();
+    case "updates.install":
+      return updateService.install();
+    case "updates.openRelease":
+      await shell.openExternal(UpdateService.releasePage);
+      return {};
     case "files.choose": {
       let path: string | undefined;
       if (p.kind === "save") {
@@ -771,6 +787,14 @@ function toolsPath() {
       );
 }
 app.whenReady().then(() => {
+  const { autoUpdater } = electronUpdater;
+  updateService = new UpdateService({
+    currentVersion: app.getVersion(),
+    platform: process.platform,
+    packaged: app.isPackaged,
+    updater: autoUpdater,
+    onStatus: (status) => event({ type: "update", data: status }),
+  });
   if (process.platform === "win32")
     app.setAppUserModelId(
       app.isPackaged ? "dev.mongoworkbench.desktop" : process.execPath,
@@ -859,7 +883,21 @@ app.whenReady().then(() => {
   });
   if (devUrl) void window.loadURL(devUrl);
   else void window.loadFile(join(__dirname, "renderer/index.html"));
-  window.once("ready-to-show", () => window.show());
+  window.once("ready-to-show", () => {
+    window.show();
+    if (app.isPackaged)
+      setTimeout(() => {
+        if (
+          shuttingDown ||
+          !shouldAutoCheckForUpdates(
+            storage.settings().autoCheckUpdates,
+            net.isOnline(),
+          )
+        )
+          return;
+        void updateService.check({ silent: true });
+      }, 2500);
+  });
 });
 app.on("window-all-closed", () => app.quit());
 app.on("before-quit", () => {

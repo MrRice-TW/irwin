@@ -37,7 +37,7 @@ monaco.languages.setMonarchTokensProvider(mongoJsonLanguage, {
       [/\/\/.*$/, "comment"],
       [/"(?:\\.|[^"\\])*"/, "string"],
       [
-        /(ObjectId|Long|Decimal128|ISODate|Binary|UUID|Timestamp|RegExp)(?=\s*\()/,
+        /(ObjectId|Int32|Double|Long|Decimal128|NumberInt|NumberLong|NumberDecimal|ISODate|Binary|UUID|Timestamp|RegExp)(?=\s*\()/,
         "type.identifier",
       ],
       [/-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/, "number"],
