@@ -1,4 +1,5 @@
 import type { Settings } from "../shared/contracts";
+import { decode, encode } from "../shared/bson";
 
 export const shellJsonLanguage = "mongo-json" as const;
 
@@ -20,21 +21,28 @@ function jsonValue(value: any, depth: number, indent: number): string {
       value.map((item) => childPad + jsonValue(item, depth + 1, indent)).join(",\n") +
       "\n" + pad + "]";
   }
-  if (value.$oid) return "ObjectId(" + JSON.stringify(value.$oid) + ")";
-  if (value.$numberInt !== undefined) return String(Number(value.$numberInt));
-  if (value.$numberDouble !== undefined) return String(value.$numberDouble);
-  if (value.$numberLong !== undefined) {
-    const n = Number(value.$numberLong);
-    return Number.isSafeInteger(n)
-      ? String(n)
-      : "Long(" + JSON.stringify(String(value.$numberLong)) + ")";
-  }
+  if (typeof value.$oid === "string")
+    return "ObjectId(" + JSON.stringify(value.$oid) + ")";
+  if (value.$numberInt !== undefined)
+    return "Int32(" + JSON.stringify(String(value.$numberInt)) + ")";
+  if (value.$numberDouble !== undefined)
+    return "Double(" + JSON.stringify(String(value.$numberDouble)) + ")";
+  if (value.$numberLong !== undefined)
+    return "Long(" + JSON.stringify(String(value.$numberLong)) + ")";
   if (value.$numberDecimal !== undefined)
     return "Decimal128(" + JSON.stringify(value.$numberDecimal) + ")";
   if (value.$date) {
-    const millis = Number(value.$date.$numberLong ?? value.$date);
-    const iso = Number.isNaN(millis) ? String(value.$date) : new Date(millis).toISOString();
-    return "ISODate(" + JSON.stringify(iso) + ")";
+    const millis = value.$date.$numberLong ?? value.$date;
+    if (typeof millis === "string" && /^-?\d+$/.test(millis)) {
+      const exactMillis = BigInt(millis);
+      if (exactMillis < -8640000000000000n || exactMillis > 8640000000000000n)
+        return JSON.stringify(value);
+      return "ISODate(" + JSON.stringify(new Date(Number(exactMillis)).toISOString()) + ")";
+    }
+    const date = new Date(millis);
+    return Number.isNaN(date.valueOf())
+      ? JSON.stringify(value)
+      : "ISODate(" + JSON.stringify(date.toISOString()) + ")";
   }
 
   const entries = Object.entries(value);
@@ -52,6 +60,6 @@ function jsonValue(value: any, depth: number, indent: number): string {
 export function prettyDocument(value: any, options: JsonFormatOptions = {}): string {
   return jsonValue(value, 0, options.indent ?? 2);
 }
-export function formatDocument(value: string, indent: number): string {
-  return JSON.stringify(JSON.parse(value), null, indent);
+export function formatDocument(value: string, indent: Settings["tabWidth"]): string {
+  return prettyDocument(JSON.parse(encode(decode(value))), { indent });
 }

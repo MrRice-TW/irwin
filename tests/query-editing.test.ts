@@ -5,6 +5,7 @@ import {
   querySortDirections,
   hasQuerySort,
   queryKeyIntent,
+  querySuggestionKeyIntent,
 } from "../src/renderer/query-editing";
 
 test("query keys keep Enter as a newline and reserve query execution for F5", () => {
@@ -16,6 +17,26 @@ test("query keys keep Enter as a newline and reserve query execution for F5", ()
   expect(queryKeyIntent("Tab", true)).toBe("unindent");
   expect(queryKeyIntent("Tab", true, true)).toBeUndefined();
   expect(queryKeyIntent("Tab", false, false, true)).toBeUndefined();
+});
+
+test("query suggestion keys accept the highlighted item with Enter", () => {
+  expect(querySuggestionKeyIntent("Enter", true, 3, 1)).toEqual({
+    type: "accept",
+    index: 1,
+  });
+  expect(querySuggestionKeyIntent("Enter", false, 3, 1)).toBeUndefined();
+  expect(querySuggestionKeyIntent("Enter", true, 0, 1)).toBeUndefined();
+  expect(querySuggestionKeyIntent("ArrowDown", true, 3, 2)).toEqual({
+    type: "move",
+    index: 0,
+  });
+  expect(querySuggestionKeyIntent("ArrowUp", true, 3, 0)).toEqual({
+    type: "move",
+    index: 2,
+  });
+  expect(querySuggestionKeyIntent("Escape", true, 3, 1)).toEqual({
+    type: "dismiss",
+  });
 });
 
 test("query indentation can be undone across selected lines or at one caret line", () => {
@@ -64,6 +85,13 @@ test("query formatter accepts shell keys, nested conditions and canonical BSON",
     values: [null, true],
   });
   expect(formatQuery(source, 4)).toContain('\n    "kind"');
+});
+test("query formatter preserves literal ISODate and new Date expressions", () => {
+  const query =
+    '{ createdAt: { $gte: ISODate("2025-01-01T00:00:00.000Z"), $lt: new Date("2025-02-01T00:00:00.000Z") } }';
+  const formatted = formatQuery(query);
+  expect(formatted).toContain('ISODate("2025-01-01T00:00:00.000Z")');
+  expect(formatted).toContain('new Date("2025-02-01T00:00:00.000Z")');
 });
 test("formatting preserves numeric lexemes and Int64 strings without evaluation", () => {
   expect(

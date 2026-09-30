@@ -1719,7 +1719,7 @@ export default function CollectionTab({
           close={requestCloseDocEditor}
           footer={
             <>
-              <span className="muted">Extended JSON · BSON</span>
+              <span className="muted">Mongo Shell · BSON</span>
               <button
                 className="icon"
                 aria-label={t("複製內容", "Copy content")}
@@ -1860,8 +1860,8 @@ export default function CollectionTab({
               return (
                 <p className="notice error">
                   {t(
-                    "目前內容不是有效的 Extended JSON，請先格式化或修正後再比較。",
-                    "The current content is not valid Extended JSON. Correct it before comparing.",
+                    "目前內容不是有效的 JSON 或 Mongo Shell 文件，請先格式化或修正後再比較。",
+                    "The current content is not valid JSON or a Mongo Shell document. Correct it before comparing.",
                   )}
                 </p>
               );

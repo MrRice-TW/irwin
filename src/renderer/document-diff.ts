@@ -1,3 +1,6 @@
+import { decode, encode } from "../shared/bson";
+import { prettyDocument } from "./json-format";
+
 export type DocumentChange = {
   path: string;
   kind: "added" | "removed" | "changed";
@@ -6,7 +9,18 @@ export type DocumentChange = {
 };
 
 function valueText(value: unknown) {
-  return JSON.stringify(value);
+  if (value === undefined) return "undefined";
+  const displayValue =
+    value !== null && typeof value === "object"
+      ? JSON.parse(encode(value))
+      : value;
+  return prettyDocument(displayValue);
+}
+
+function isDocument(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
 function diff(
@@ -15,14 +29,7 @@ function diff(
   path: string,
   output: DocumentChange[],
 ) {
-  if (
-    before &&
-    after &&
-    typeof before === "object" &&
-    typeof after === "object" &&
-    !Array.isArray(before) &&
-    !Array.isArray(after)
-  ) {
+  if (isDocument(before) && isDocument(after)) {
     for (const key of [...new Set([...Object.keys(before), ...Object.keys(after)])].sort()) {
       const child = path ? `${path}.${key}` : key;
       if (!Object.hasOwn(before, key))
@@ -39,6 +46,6 @@ function diff(
 
 export function documentChanges(original: string, current: string): DocumentChange[] {
   const output: DocumentChange[] = [];
-  diff(JSON.parse(original), JSON.parse(current), "", output);
+  diff(decode(original), decode(current), "", output);
   return output;
 }

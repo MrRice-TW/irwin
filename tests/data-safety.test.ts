@@ -45,6 +45,46 @@ describe("BSON fidelity", () => {
     expect(value._id.valueOf()).toBe(-1);
     expect(value.name).toBe("Ada");
   });
+  test.each([
+    ["ISODate('2026-07-02T09:26:31.616Z')", "2026-07-02T09:26:31.616Z"],
+    ['ISODate("2025-01-02T03:04:05.000Z")', "2025-01-02T03:04:05.000Z"],
+    ['new Date("2025-01-02T03:04:05.000Z")', "2025-01-02T03:04:05.000Z"],
+    ["new Date(1735787045000)", "2025-01-02T03:04:05.000Z"],
+  ])("parses literal BSON date expressions: %s", (expression, expected) => {
+    expect(object(`{createdAt: ${expression}}`).createdAt).toEqual(
+      new Date(expected),
+    );
+  });
+  test("supports new Date() as the current instant without evaluating code", () => {
+    const before = Date.now();
+    const document = object(
+      "{updatedAt: new Date(), providerConfig: {updatedAt: new Date()}}",
+    );
+    const after = Date.now();
+
+    for (const value of [document.updatedAt, document.providerConfig.updatedAt]) {
+      expect(value).toBeInstanceOf(Date);
+      expect(value.valueOf()).toBeGreaterThanOrEqual(before);
+      expect(value.valueOf()).toBeLessThanOrEqual(after);
+    }
+  });
+  test("rejects dynamic, missing, or invalid date expressions", () => {
+    expect(() => decode("{createdAt: ISODate()}")).toThrow();
+    expect(() => decode('{createdAt: ISODate("not a date")}')).toThrow();
+    expect(() => decode("{createdAt: new Date(Date.now())}")).toThrow();
+    expect(() => decode('{createdAt: new Date("2025-02-31")}')).toThrow();
+  });
+  test("reports the source line and column for invalid shell constructors", () => {
+    const source =
+      "{\n  createdAt: ISODate('2026-07-09T09:38:07.797Z'),\n  updatedAt: new Date(2026, 6, 2),\n}";
+    expect(() => decode(source)).toThrow(
+      /line 3, column 14: Date accepts zero arguments or one literal argument/,
+    );
+  });
+  test("reports the source line for Mongo shell syntax errors", () => {
+    const source = "{\n  createdAt: ISODate(\n}";
+    expect(() => decode(source)).toThrow(/line 3, column \d+:/);
+  });
   const values = [
     new ObjectId(),
     Long.fromString("9223372036854775807"),

@@ -37,6 +37,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
+  RefreshCw,
 } from "lucide-react";
 import {
   settingsSchema,
@@ -46,8 +47,10 @@ import {
   type TransferInput,
   type ShellDraft,
 } from "../shared/contracts";
+import type { UpdateStatus } from "../main/update-service";
 import { UiContext, Modal, Field, api, message } from "./ui";
 import { PreferencesDialog } from "./PreferencesDialog";
+import { UpdateDialog } from "./UpdateDialog";
 import ConnectionDialog from "./ConnectionDialog";
 import type { ShellDraftChange, WorkspaceTab } from "./CollectionTab";
 import TransferDialog from "./TransferDialog";
@@ -88,6 +91,10 @@ export default function App() {
   settingsRef.current = settings;
   const notifiedJobs = useRef(new Set<string>());
   const [preferences, setPreferences] = useState(false);
+  const [showUpdates, setShowUpdates] = useState(false);
+  const [applicationVersion, setApplicationVersion] = useState("");
+  const [applicationPlatform, setApplicationPlatform] = useState("");
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>();
   const [preferencesSection, setPreferencesSection] =
     useState<PreferenceSection>("appearance");
   const [settingsDraft, setSettingsDraft] = useState<Settings>(() =>
@@ -191,6 +198,19 @@ export default function App() {
   }, []);
   const notify = (text: string, error = false) =>
     setToast({ text, error, time: Date.now() });
+  const checkForUpdates = () =>
+    void api
+      .request("updates.check", {})
+      .then(setUpdateStatus)
+      .catch((error) => notify(message(error), true));
+  const installUpdate = () =>
+    void api
+      .request("updates.install", {})
+      .catch((error) => notify(message(error), true));
+  const openReleasePage = () =>
+    void api
+      .request("updates.openRelease", {})
+      .catch((error) => notify(message(error), true));
   const loadProfiles = () =>
     api
       .request("connections.list", {})
@@ -216,8 +236,11 @@ export default function App() {
     void api
       .request("app.status", {})
       .then((s) => {
+        setApplicationVersion(s.version);
+        setApplicationPlatform(s.platform);
         setSecure(s.secureStorage);
         setConnected(s.connections);
+        setUpdateStatus(s.update);
       })
       .catch((e) => notify(message(e), true));
     void api
@@ -272,6 +295,7 @@ export default function App() {
           );
       }
       if (event.type === "openJobs") setShowJobs(true);
+      if (event.type === "update") setUpdateStatus(event.data);
     });
   }, []);
   useEffect(() => {
@@ -807,6 +831,7 @@ export default function App() {
               ]
             : []),
         ];
+  const updateAvailable = Boolean(updateStatus?.availableVersion);
   return (
     <UiContext.Provider value={uiValue}>
       <div className="app-shell">
@@ -1446,7 +1471,39 @@ export default function App() {
             <span>
               {connected.length} {t("個連線開啟", "connections open")}
             </span>
-            <span className="version">v0.1.0</span>
+            <button
+              className={`version ${
+                updateAvailable ? "version-update-available" : ""
+              }`}
+              aria-label={t(
+                updateAvailable
+                  ? `目前版本 v${applicationVersion || "…"}，有新版本 v${updateStatus?.availableVersion} 可用，開啟查看更新`
+                  : `目前版本 v${applicationVersion || "…"}，開啟更新檢查`,
+                updateAvailable
+                  ? `Version ${applicationVersion || "…"}; version ${updateStatus?.availableVersion} is available, open updates`
+                  : `Version ${applicationVersion || "…"}, open update checker`,
+              )}
+              title={t(
+                updateAvailable
+                  ? `有新版本 v${updateStatus?.availableVersion} 可用，點此查看`
+                  : "檢查軟體更新",
+                updateAvailable
+                  ? `Version ${updateStatus?.availableVersion} is available. Click to view.`
+                  : "Check for software updates",
+              )}
+              onClick={() => {
+                setShowUpdates(true);
+                checkForUpdates();
+              }}
+            >
+              {updateStatus?.state === "checking" ? (
+                <RefreshCw size={11} className="update-version-spinner" />
+              ) : null}
+              v{applicationVersion || "…"}
+              {updateAvailable && (
+                <span className="version-update-dot" aria-hidden="true" />
+              )}
+            </button>
           </div>
         </aside>
         <div
@@ -2353,6 +2410,17 @@ export default function App() {
             onClose={() => setPreferences(false)}
           />
         )}{" "}
+        {showUpdates && (
+          <UpdateDialog
+            currentVersion={applicationVersion || "…"}
+            platform={applicationPlatform}
+            status={updateStatus}
+            onCheck={checkForUpdates}
+            onInstall={installUpdate}
+            onOpenRelease={openReleasePage}
+            onClose={() => setShowUpdates(false)}
+          />
+        )}
         {transfer && (
           <TransferDialog
             initial={transfer}

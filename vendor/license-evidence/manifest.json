@@ -58,6 +58,14 @@
         "sourceUrl": "https://registry.npmjs.org/isarray/1.0.0"
       }
     },
+    "lazy-val@1.0.5": {
+      "notice": {
+        "source": "vendor",
+        "path": "lazy-val-MIT-LICENSE.txt",
+        "sha256": "efe8f1903440d3e757fa3c91fdbbe410c496b7983f1a92420f252ce3b417e0ee",
+        "sourceUrl": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/MIT.txt"
+      }
+    },
     "macos-export-certificate-and-key@2.0.1": {
       "notice": {
         "source": "vendor",

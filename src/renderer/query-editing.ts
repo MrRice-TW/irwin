@@ -2,6 +2,27 @@ import { parseExpression } from "@babel/parser";
 import { object } from "../shared/bson";
 
 export type QueryKeyIntent = "run" | "newline" | "indent" | "unindent";
+export type QuerySuggestionIntent =
+  | { type: "accept"; index: number }
+  | { type: "move"; index: number }
+  | { type: "dismiss" };
+
+export function querySuggestionKeyIntent(
+  key: string,
+  isOpen: boolean,
+  optionCount: number,
+  selectedIndex: number,
+): QuerySuggestionIntent | undefined {
+  if (!isOpen || optionCount < 1) return undefined;
+  const index = ((selectedIndex % optionCount) + optionCount) % optionCount;
+  if (key === "Enter") return { type: "accept", index };
+  if (key === "ArrowDown")
+    return { type: "move", index: (index + 1) % optionCount };
+  if (key === "ArrowUp")
+    return { type: "move", index: (index + optionCount - 1) % optionCount };
+  if (key === "Escape") return { type: "dismiss" };
+  return undefined;
+}
 
 export function queryKeyIntent(
   key: string,
@@ -134,6 +155,28 @@ export function formatQuery(text: string, indent = 2): string {
       node.argument.type === "NumericLiteral"
     )
       return node.operator + print(node.argument, depth);
+    if (
+      node.type === "CallExpression" &&
+      !node.optional &&
+      node.callee.type === "Identifier" &&
+      node.callee.name === "ISODate" &&
+      node.arguments.length === 1 &&
+      node.arguments[0].type === "StringLiteral"
+    )
+      return `ISODate(${JSON.stringify(node.arguments[0].value)})`;
+    if (
+      node.type === "NewExpression" &&
+      node.callee.type === "Identifier" &&
+      node.callee.name === "Date" &&
+      node.arguments.length === 1 &&
+      ["StringLiteral", "NumericLiteral", "UnaryExpression"].includes(
+        node.arguments[0].type,
+      ) &&
+      (node.arguments[0].type !== "UnaryExpression" ||
+        (["-", "+"].includes(node.arguments[0].operator) &&
+          node.arguments[0].argument.type === "NumericLiteral"))
+    )
+      return `new Date(${print(node.arguments[0], depth)})`;
     throw new Error(`Unsupported query expression: ${node.type}`);
   };
   return print(root, 0);

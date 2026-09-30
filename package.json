@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:integration": "vitest run tests/integration.test.ts",
+    "test:e2e:tooltips": "node tests/e2e/tooltips.mjs",
     "release:licenses": "node scripts/third-party-notices.mjs",
     "package": "pnpm release:licenses && pnpm build && node scripts/check-tools.mjs && node scripts/package.mjs",
     "package:dir": "pnpm release:licenses && pnpm build && node scripts/check-tools.mjs && node scripts/package.mjs --dir",
@@ -39,6 +40,7 @@
     "bson": "^7.3.2",
     "csv-parse": "^7.0.2",
     "csv-stringify": "^6.8.3",
+    "electron-updater": "6.8.9",
     "exceljs": "4.4.0",
     "lucide-react": "^1.43.0",
     "monaco-editor": "^0.56.0",
@@ -51,7 +53,13 @@
     "zod": "^4.5.4"
   },
   "build": {
-    "publish": [],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "piayru",
+        "repo": "irwin"
+      }
+    ],
     "npmRebuild": false,
     "appId": "dev.mongoworkbench.desktop",
     "productName": "Irwin",

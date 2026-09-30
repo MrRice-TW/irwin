@@ -4,6 +4,12 @@ Irwin is distributed through GitHub Releases using direct installer downloads, n
 
 The Preview release policy is to ship without a paid publisher certificate or Apple notarization. Each release must state this clearly, include SHA-256 checksums, and identify the tested operating systems and architectures. Signing can be added later without moving distribution to a store. Download both the installer and its checksum from the project's own GitHub Release; a matching checksum confirms the file matches that release, but does not replace publisher verification.
 
+## Check for and install updates
+
+Click the version number at the bottom of Irwin's sidebar to check GitHub Releases. Packaged Windows and Ubuntu builds download a newer release in the background; Irwin waits for you to choose **Restart and install**. Installing a Linux `.deb` may open a system authentication prompt. Unsigned macOS builds can check for a release and open its download page, but must be updated by downloading the DMG and replacing Irwin in **Applications**. macOS in-app installation requires signed builds, which this Preview does not provide.
+
+The first release that includes the updater cannot update installations that predate this feature. Install that release manually once; later Windows and Ubuntu releases can use in-app updates. Release metadata and the installer it references must be published together in the same public GitHub Release (`latest.yml` for Windows and `latest-linux.yml` for Ubuntu). A local build made with `--publish never` is for validation and does not publish update metadata. See the [release checklist](RELEASE_CHECKLIST.md) before publishing an update.
+
 ## Windows 11 x64
 
 When a validated release is available, download `Irwin-<version>-win-x64.exe` and its checksum file from that release. Verify the checksum, then run the installer and follow its prompts. Unsigned Preview installers can display **Unknown publisher** and **Windows protected your PC**. If the file matches the trusted release and Windows offers the option, choose **More info → Run anyway** for this installer. Do not change system-wide protection settings. Smart App Control or an organization's policy may block unsigned applications without offering this option; use a machine permitted by that policy or ask its administrator.
@@ -79,5 +85,7 @@ node scripts/verify-package.mjs --unpacked release/mac-arm64/Irwin.app
 ```
 
 Local package output is unsigned unless the maintainer configures platform signing. A package build does not count as native installation validation. See the [compatibility matrix](COMPATIBILITY.md) and [release checklist](RELEASE_CHECKLIST.md) before distributing an installer.
+
+For a public release with in-app updates, build each supported target with the configured GitHub publisher (`pnpm package --publish always`) from a maintainer environment with `GH_TOKEN` set. This uploads installers and updater metadata to GitHub Releases; it does not submit the app to a store. Keep the release public and ensure all platform installers and generated metadata refer to the same version. Do not use this command for local validation.
 
 There is currently no published Homebrew tap, winget manifest, or hosted APT repository. The commands above install a downloaded `.deb` or build from source; do not use guessed package-manager names to install Irwin.

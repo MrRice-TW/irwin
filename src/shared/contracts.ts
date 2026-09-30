@@ -124,6 +124,7 @@ export const settingsSchema = z.object({
   editorLineHeight: z.number().int().min(18).max(36).default(24),
   editorPadding: z.number().int().min(8).max(32).default(16),
   autoRunOnOpen: z.boolean().default(true),
+  autoCheckUpdates: z.boolean().default(true),
   rowDensity: z.enum(["comfortable", "compact"]).default("comfortable"),
   longTextDisplay: z.enum(["truncate", "wrap"]).default("truncate"),
   bsonTypeLabels: z.enum(["selected", "always"]).default("selected"),
@@ -443,6 +444,9 @@ export const commands = {
     defaultPath: z.string().optional(),
   }),
   "app.status": z.object({}),
+  "updates.check": z.object({}),
+  "updates.install": z.object({}),
+  "updates.openRelease": z.object({}),
   "clipboard.write": z.object({ text: z.string().max(32 * 1024 * 1024) }),
 } as const;
 export type Command = keyof typeof commands;
@@ -481,7 +485,7 @@ export interface JobProgress {
   errorPath?: string;
 }
 export interface AppEvent {
-  type: "job" | "connection" | "shell" | "analysis" | "openJobs";
+  type: "job" | "connection" | "shell" | "analysis" | "openJobs" | "update";
   data: any;
 }
 export interface WorkbenchApi {

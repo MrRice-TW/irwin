@@ -616,7 +616,7 @@ export function Results({
               )}
             </span>
             <span className="json-badge">
-              {ui.tabWidth} spaces · Extended JSON
+              {ui.tabWidth} spaces · Mongo Shell · BSON
             </span>
           </div>
           <div className="json-editor-surface">

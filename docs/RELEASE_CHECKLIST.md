@@ -12,6 +12,10 @@ Before publishing any public release:
 - [ ] Run `pnpm release:licenses`, review the generated full production dependency inventory and missing-license report, and confirm the files are inside the installer alongside the bundled-tool notices.
 - [ ] Confirm `license-review.txt` reports no unresolved packages for each platform's production dependency tree. Do not publish a target while a package has missing license metadata or missing license/notice text.
 - [ ] Confirm the release notes describe only validated platforms and link to artifacts that actually exist.
+- [ ] For Windows and Ubuntu in-app updates, build with the GitHub publisher and confirm `latest.yml` / `latest-linux.yml` plus every installer referenced by the metadata are attached to the same public release. Local builds with `--publish never` do not create a published update feed.
+- [ ] Test an update from the previous installed version. Existing installations that predate the updater need one manual installation of an updater-enabled release.
+- [ ] Confirm unsigned Windows update metadata and installers are built together and uploaded to the project's public GitHub release over HTTPS; explain that checksum validation verifies file integrity but does not establish the publisher's identity.
+- [ ] Confirm macOS release notes direct users to install the DMG manually; in-app installation is unavailable until releases are signed.
 
 ## Candidate identity
 

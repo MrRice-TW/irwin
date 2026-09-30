@@ -11,8 +11,31 @@ describe("document changes", () => {
     ).toEqual([
       { path: "meta.active", kind: "changed", before: "true", after: "false" },
       { path: "name", kind: "changed", before: '"Ada"', after: '"Grace"' },
-      { path: "new", kind: "added", after: "2" },
-      { path: "old", kind: "removed", before: "1" },
+      { path: "new", kind: "added", after: 'Int32("2")' },
+      { path: "old", kind: "removed", before: 'Int32("1")' },
+    ]);
+  });
+
+  it("compares canonical Extended JSON with the friendly editor syntax by BSON type", () => {
+    expect(
+      documentChanges(
+        '{"_id":{"$oid":"507f1f77bcf86cd799439011"},"count":{"$numberInt":"1"}}',
+        '{ _id: ObjectId("507f1f77bcf86cd799439011"), count: Int32("1") }',
+      ),
+    ).toEqual([]);
+
+    expect(
+      documentChanges(
+        '{"count":{"$numberDouble":"1.0"}}',
+        '{ count: Int32("1") }',
+      ),
+    ).toEqual([
+      {
+        path: "count",
+        kind: "changed",
+        before: 'Double("1.0")',
+        after: 'Int32("1")',
+      },
     ]);
   });
 });

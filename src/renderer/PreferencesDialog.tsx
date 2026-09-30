@@ -3,6 +3,7 @@ import {
   Code2,
   Languages,
   Palette,
+  RefreshCw,
   RotateCcw,
   Sparkles,
   TableProperties,
@@ -33,6 +34,7 @@ const sections: {
     zh: "資料與語言",
     en: "Data & language",
   },
+  { id: "updates", icon: RefreshCw, zh: "更新", en: "Updates" },
 ];
 
 const lightThemes = [
@@ -709,6 +711,42 @@ export function PreferencesDialog({
                   ))}
                 </div>
               </div>
+            </>
+          )}
+
+          {section === "updates" && (
+            <>
+              <div className="preferences-section-head">
+                <div>
+                  <h3>{t("更新", "Updates")}</h3>
+                  <p>
+                    {t(
+                      "管理 Irwin 如何檢查新版本。",
+                      "Control how Irwin checks for new versions.",
+                    )}
+                  </p>
+                </div>
+              </div>
+              <label className="preference-toggle">
+                <span>
+                  <strong>
+                    {t("自動檢查更新", "Automatically check for updates")}
+                  </strong>
+                  <small>
+                    {t(
+                      "每次啟動時檢查一次。離線時略過；檢查失敗不會打擾你。",
+                      "Checks once when Irwin starts. Offline checks are skipped, and failures stay quiet.",
+                    )}
+                  </small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={draft.autoCheckUpdates}
+                  onChange={(event) =>
+                    update("autoCheckUpdates", event.target.checked)
+                  }
+                />
+              </label>
             </>
           )}
 

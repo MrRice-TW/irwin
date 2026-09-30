@@ -352,6 +352,28 @@ select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
+.app-tooltip {
+  position: fixed;
+  z-index: 10000;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 6px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  box-shadow: 0 5px 18px #0005;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.app-tooltip[data-placement="above"] {
+  transform: translate(-50%, -100%);
+}
 button.primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -736,6 +758,29 @@ small {
 .version {
   margin-left: auto;
   color: var(--muted);
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  padding: 4px 5px;
+  font-size: inherit;
+  line-height: 1;
+}
+.version:hover {
+  color: var(--text);
+  background: var(--hover);
+  border-color: transparent;
+}
+.version-update-available {
+  color: var(--accent);
+}
+.version-update-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--positive);
+}
+.update-version-spinner {
+  animation: spin 1.3s linear infinite;
 }
 .sidebar-empty {
   text-align: center;
@@ -2444,6 +2489,77 @@ button {
 }
 .modal-footer > .muted {
   margin-right: auto;
+  font-size: 10px;
+}
+.modal.update-modal {
+  width: min(580px, 90vw);
+}
+.update-content {
+  display: grid;
+  gap: 14px;
+}
+.update-state {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  line-height: 1.55;
+}
+.update-state-error {
+  color: var(--danger);
+}
+.update-spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.update-content p {
+  margin: 0;
+  line-height: 1.65;
+}
+.update-release-title,
+.update-notes h3 {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+.update-notes {
+  display: grid;
+  gap: 8px;
+}
+.update-notes pre {
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.update-progress {
+  position: relative;
+  height: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input);
+}
+.update-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent-soft);
+  transition: width 160ms ease-out;
+}
+.update-progress small {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text);
   font-size: 10px;
 }
 .shell-draft-list {
